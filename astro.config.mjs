@@ -10,6 +10,7 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   site: "https://defite.blog",
   integrations: [mdx(), sitemap()],
+  output: "static",
 
   vite: {
     plugins: [tailwindcss()],
