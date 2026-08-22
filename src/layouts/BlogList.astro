@@ -1,0 +1,138 @@
+---
+import { getCollection } from "astro:content";
+import BaseHead from "../components/BaseHead.astro";
+import FormattedDate from "../components/FormattedDate.astro";
+import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
+import { ChevronRight, ChevronLeft } from "@lucide/astro";
+
+const allPosts = (await getCollection("blog")).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+const allPostsCount = allPosts.length;
+
+const ITEMS_PER_PAGE = 5;
+const totalPages = Math.ceil(allPostsCount / ITEMS_PER_PAGE);
+const currentPage = Number(Astro.url.searchParams.get("page")) || 1;
+const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+const paginatedPosts = allPosts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+const navButtonBaseClass =
+  "h-8 w-fit px-2 flex items-center justify-center text-sm border border-border rounded-lg";
+const navButtonDisabledClass = "opacity-50 cursor-not-allowed";
+const navButtonActiveClass =
+  "hover:bg-accent/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+  </head>
+  <body class="min-h-screen bg-background font-sans antialiased relative">
+    <main class="relative z-10 max-w-2xl mx-auto py-12 pb-24 sm:py-24 px-6">
+      <div class="flex justify-start gap-4 items-center">
+        <a
+          href="/"
+          class="text-sm text-muted-foreground hover:text-foreground transition-colors border border-border rounded-lg px-2 py-1 inline-flex items-center gap-1 mb-6 group"
+          aria-label="Go home!"
+        >
+          <ChevronLeft
+            class="size-3 group-hover:-translate-x-px transition-transform"
+          />
+          Go home!
+        </a>
+      </div>
+
+      <section>
+        <div>
+          <h1 class="text-2xl font-semibold tracking-tight mb-4">
+            Blog{" "}
+            <span
+              class="ml-1 bg-card border border-border rounded-md px-2 py-1 text-muted-foreground text-sm"
+            >
+              {allPostsCount} posts
+            </span>
+          </h1>
+          <p class="text-sm text-muted-foreground mb-8">
+            My personal reflections about web development, life, and more.
+          </p>
+        </div>
+
+        <div class="flex flex-col gap-5">
+          {
+            paginatedPosts.map((post, id) => {
+              const indexNumber = startIndex + id + 1;
+              return (
+                <a
+                  class="flex items-start gap-x-2 group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  href={`/blog/${post.id}`}
+                >
+                  <span class="text-xs font-mono tabular-nums font-medium mt-1.25">
+                    {String(indexNumber).padStart(2, "0")}.
+                  </span>
+                  <div class="flex flex-col gap-y-2 flex-1">
+                    <p class="tracking-tight text-lg font-medium">
+                      <span class="group-hover:text-foreground transition-colors">
+                        {post.data.title}
+                        <ChevronRight
+                          class="ml-1 inline-block size-4 stroke-3 text-muted-foreground opacity-0 -translate-x-2 transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-0"
+                          aria-hidden
+                        />
+                      </span>
+                    </p>
+                    <p class="text-xs text-muted-foreground">
+                      <FormattedDate date={post.data.pubDate} />
+                    </p>
+                  </div>
+                </a>
+              );
+            })
+          }
+        </div>
+
+        {
+          totalPages > 1 && (
+            <div>
+              <div class="flex gap-3 flex-row items-center justify-between mt-8">
+                <div class="text-sm text-muted-foreground">
+                  Page {currentPage} of {totalPages}
+                </div>
+                <div class="flex gap-2 sm:justify-end">
+                  <a
+                    href={
+                      currentPage === 2
+                        ? "/blog"
+                        : `/blog?page=${currentPage - 1}`
+                    }
+                    class:list={[
+                      navButtonBaseClass,
+                      {
+                        [navButtonDisabledClass]: currentPage === 1,
+                        [navButtonActiveClass]: currentPage > 1,
+                      },
+                    ]}
+                  >
+                    Previous
+                  </a>
+
+                  <a
+                    href={`/blog?page=${currentPage + 1}`}
+                    class:list={[
+                      navButtonBaseClass,
+                      {
+                        [navButtonDisabledClass]: currentPage === totalPages,
+                        [navButtonActiveClass]: currentPage < totalPages,
+                      },
+                    ]}
+                  >
+                    Next
+                  </a>
+                </div>
+              </div>
+            </div>
+          )
+        }
+      </section>
+    </main>
+  </body>
+</html>

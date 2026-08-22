@@ -1,0 +1,111 @@
+---
+import "../styles/global.css";
+import type { CollectionEntry } from "astro:content";
+import BaseHead from "../components/BaseHead.astro";
+import FormattedDate from "../components/FormattedDate.astro";
+import { ChevronLeft, ChevronRight } from "@lucide/astro";
+
+type Props = CollectionEntry<"blog">["data"] & {
+  previousPost: CollectionEntry<"blog"> | null;
+  nextPost: CollectionEntry<"blog"> | null;
+};
+
+const { title, description, pubDate, previousPost, nextPost } = Astro.props;
+---
+
+<html lang="en">
+  <head>
+    <BaseHead title={title} description={description} />
+  </head>
+
+  <body class="min-h-screen bg-background font-sans antialiased relative">
+    <main class="relative z-10 max-w-2xl mx-auto py-12 pb-24 sm:py-24 px-6">
+      <div class="flex justify-start gap-4 items-center">
+        <a
+          href="/blog"
+          class="text-sm text-muted-foreground hover:text-foreground transition-colors border border-border rounded-lg px-2 py-1 inline-flex items-center gap-1 mb-6 group"
+          aria-label="Back to Blog"
+        >
+          <ChevronLeft
+            class="size-3 group-hover:-translate-x-px transition-transform"
+          />
+          Back to Blog
+        </a>
+      </div>
+
+      <article>
+        <div class="flex flex-col gap-4">
+          <h1
+            class="title font-semibold text-3xl md:text-4xl tracking-tighter leading-tight"
+          >
+            {title}
+          </h1>
+          <p class="text-sm text-muted-foreground">
+            <FormattedDate date={pubDate} />
+          </p>
+        </div>
+        <div class="my-6 flex w-full items-center">
+          <div
+            class="flex-1 h-px bg-border"
+            style="mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent); -webkit-mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);"
+          >
+          </div>
+        </div>
+        <!-- <div class="hero-image">
+          {
+            heroImage && (
+              <Image width={1020} height={510} src={heroImage} alt="" />
+            )
+          }
+        </div> -->
+        <div
+          class="prose max-w-full text-pretty font-sans leading-relaxed text-muted-foreground dark:prose-invert"
+        >
+          <slot />
+        </div>
+
+        <nav class="mt-12 pt-8 max-w-2xl">
+          <div class="flex flex-col sm:flex-row justify-between gap-4">
+            {
+              previousPost ? (
+                <a
+                  href={`/blog/${previousPost.id}`}
+                  class="group flex-1 flex flex-col gap-1 p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors"
+                >
+                  <span class="flex items-center gap-1 text-xs text-muted-foreground">
+                    <ChevronLeft class="size-3" />
+                    Previous
+                  </span>
+                  <span class="text-sm font-medium group-hover:text-foreground transition-colors whitespace-normal wrap-break-word">
+                    {previousPost.data.title}
+                  </span>
+                </a>
+              ) : (
+                <div class="hidden sm:block flex-1" />
+              )
+            }
+
+            {
+              nextPost ? (
+                <a
+                  href={`/blog/${nextPost.id}`}
+                  class="group flex-1 flex flex-col gap-1 p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors text-right"
+                >
+                  <span class="flex items-center justify-end gap-1 text-xs text-muted-foreground">
+                    Next
+                    <ChevronRight class="size-3" />
+                  </span>
+                  <span class="text-sm font-medium group-hover:text-foreground transition-colors whitespace-normal wrap-break-word">
+                    {nextPost.data.title}
+                  </span>
+                </a>
+              ) : (
+                <div class="hidden sm:block flex-1" />
+              )
+            }
+          </div>
+        </nav>
+      </article>
+    </main>
+  </body>
+</html>

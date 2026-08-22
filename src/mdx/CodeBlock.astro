@@ -1,0 +1,21 @@
+---
+const props = Astro.props;
+const { "data-title": dataTitle, class: className, ...restProps } = props;
+
+console.log("props", restProps);
+---
+
+<div
+  class="group relative rounded-xl overflow-hidden border border-border my-6"
+>
+  {
+    dataTitle && (
+      <div class="px-4 py-2 text-xs font-medium border-b border-border bg-muted/50 text-foreground">
+        {dataTitle}
+      </div>
+    )
+  }
+  <pre
+    class={`${className} p-4 m-0! overflow-x-auto text-sm`}
+    {...restProps}><slot /></pre>
+</div>

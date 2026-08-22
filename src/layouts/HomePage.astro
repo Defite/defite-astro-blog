@@ -1,0 +1,19 @@
+---
+import "../styles/global.css";
+import BaseHead from "../components/BaseHead.astro";
+import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+  </head>
+  <body class="min-h-screen bg-background font-sans antialiased relative">
+    <div class="relative z-10 max-w-2xl mx-auto py-12 pb-24 sm:py-24 px-6">
+      <main class="flex flex-col gap-14 relative">
+        <slot />
+      </main>
+    </div>
+  </body>
+</html>
